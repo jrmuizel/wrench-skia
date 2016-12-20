@@ -4,7 +4,7 @@ project (skimake)
 set (CMAKE_CXX_STANDARD 11)
 include(ExternalProject)
 
-set(SKIA_ARGS "--args=is_official_build=true skia_use_piex=false skia_enable_tools=false")
+set(SKIA_ARGS "--args=is_official_build=true skia_use_piex=false skia_enable_tools=false extra_cflags=[\"-w\"]")
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
    set(SKIA_ARGS, "${SKIA_ARGS} is_debug=true")
 endif(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -28,6 +28,30 @@ set(SKIA_BIN_DIR ${binary_dir})
 
 find_package(OpenGL REQUIRED)
 list (APPEND libs  ${OPENGL_LIBRARIES})
+if (UNIX AND NOT APPLE)
+	find_package (Freetype)
+	find_package (GIF)
+
+
+
+	find_path (FONTCONFIG_INCLUDE_DIRS "fontconfig/fontconfig.h")
+	find_library (FONTCONFIG_LIBRARIES fontconfig)
+
+	if (FREETYPE_FOUND)
+	    list (APPEND private_includes ${FREETYPE_INCLUDE_DIRS})
+	    list (APPEND libs             ${FREETYPE_LIBRARIES})
+	endif()
+
+	if (FONTCONFIG_INCLUDE_DIRS AND FONTCONFIG_LIBRARIES)
+	    list (APPEND private_includes ${FONTCONFIG_INCLUDE_DIRS})
+	    list (APPEND libs             ${FONTCONFIG_LIBRARIES})
+	endif()
+
+	# We require libjpeg-turbo >= 1.5.0.
+	find_package(PkgConfig)
+	pkg_check_modules(JPEG_TURBO libjpeg>=1.5.0)
+endif()
+
 
 if (MSVC)
   set(VIEWER_MANIFEST viewer.exe.manifest)
@@ -52,4 +76,4 @@ add_subdirectory(glfw)
 add_executable(viewer viewer.cpp yaml.cpp Color.cpp FloatRoundedRect.cpp FloatPoint.cpp BoxBorderPainter.cpp BorderEdge.cpp ObjectPainter.cpp ${VIEWER_MANIFEST})
 
 add_dependencies(viewer skia)
-target_link_libraries(viewer yaml-cpp ${SKIA_BIN_DIR}/libskia.a ${OPENGL_LIBRARIES} ${WIN32_LIBS} glfw)
+target_link_libraries(viewer yaml-cpp ${SKIA_BIN_DIR}/libskia.a ${libs} ${WIN32_LIBS} glfw)
