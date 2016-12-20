@@ -8,6 +8,7 @@
 #include "../include/core/SkCanvas.h"
 #include "../include/core/SkTypeface.h"
 #include "../include/core/SkStream.h"
+
 #include "../include/core/SkData.h"
 #include "../include/core/SkSurface.h"
 #include "../include/core/SkRefCnt.h"
@@ -16,6 +17,8 @@
 #include "../include/gpu/gl/GrGLInterface.h"
 //#include "../include/gpu/gl/GrGLDefines.h"
 #include "../include/core/SkPictureRecorder.h"
+#include "../include/core/SkImageEncoder.h"
+#include "../include/core/SkEncodedImageFormat.h"
 #include "../tools/Resources.h"
 #include "yaml.h"
 
@@ -101,10 +104,10 @@ sk_sp<SkImage> GetResourceAsImage(const char* path) {
     return SkImage::MakeFromEncoded(resourceData);
 }
 
-
+#if 0
 extern SkImageEncoder_EncodeReg gEReg;
 SkImageEncoder_EncodeReg *k = &gEReg;
-
+#endif
 
 static void error_callback(int error, const char* description)
 {
@@ -124,7 +127,7 @@ dump_to_png(SkPicture *pic, const char *png_name)
     pic->playback(ic);
 
     sk_sp<SkImage> image = surface->makeImageSnapshot();
-    std::shared_ptr<SkData> png = adopt(image->encode(SkImageEncoder::kPNG_Type, 100));
+    std::shared_ptr<SkData> png = adopt(image->encode(SkEncodedImageFormat::kPNG, 100));
 
     std::ofstream(png_name, std::ios::out | std::ios::binary)
         .write((const char*)png->data(), png->size());

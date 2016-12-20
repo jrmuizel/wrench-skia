@@ -95,17 +95,17 @@ struct GraphicsContext
             m_canvas->drawPath(path, paint);
         }
 
-        void clipRect(const SkRect& rect, SkClipOp op = kIntersect_SkClipOp)
+        void clipRect(const SkRect& rect, SkClipOp op = SkClipOp::kIntersect)
         {
             m_canvas->clipRect(rect, op, true);
         }
 
         void clipOutRoundedRect(const FloatRoundedRect& rect)
         {
-            clipRoundedRect(rect, kDifference_SkClipOp);
+            clipRoundedRect(rect, SkClipOp::kDifference);
         }
 
-        void clipRoundedRect(const FloatRoundedRect& rrect, SkClipOp op = kIntersect_SkClipOp)
+        void clipRoundedRect(const FloatRoundedRect& rrect, SkClipOp op = SkClipOp::kIntersect)
         {
             if (!rrect.isRounded()) {
                 clipRect(rrect.rect(), op);
@@ -114,14 +114,14 @@ struct GraphicsContext
             clipRRect(rrect, op);
         }
 
-        void clipRRect(const SkRRect& rect, SkClipOp op = kIntersect_SkClipOp)
+        void clipRRect(const SkRRect& rect, SkClipOp op = SkClipOp::kIntersect)
         {
             m_canvas->clipRRect(rect, op, true);
         }
 
         void clipPath(const SkPath& path, AntiAliasingMode aa)
         {
-            m_canvas->clipPath(path, kIntersect_SkClipOp, aa == AntiAliased);
+            m_canvas->clipPath(path, SkClipOp::kIntersect, aa == AntiAliased);
         }
         void fillDRRect(const FloatRoundedRect& outer,
                             const FloatRoundedRect& inner, const Color& color)
