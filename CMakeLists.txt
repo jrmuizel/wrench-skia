@@ -14,11 +14,6 @@ if(MSVC)
   set(SKIA_LIB_NAME skia.lib)
   # EVERY SPACE, \ AND " BELOW IS MAGIC. BLACK MAGIC. DO NOT TOUCH IT OR YOU WILL ANGER THE CMAKE GODS
   set(SKIA_BUILD_COMMAND cmd /s /c "cd <SOURCE_DIR> && python bin/fetch-gn && gn gen <BINARY_DIR> " ${SKIA_ARGS} "\ ")
-  if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(CMAKE_CONFIGURATION_TYPES Debug)
-  else()
-    set(CMAKE_CONFIGURATION_TYPES RelWithDebInfo)
-  endif()
 
   # build using the static runtime, to match skia
   foreach(flag_var
