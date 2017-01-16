@@ -4,15 +4,16 @@ project (skimake)
 set (CMAKE_CXX_STANDARD 11)
 include(ExternalProject)
 
-set(SKIA_ARGS "is_official_build=true skia_use_piex=false skia_enable_tools=false")
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-   set(SKIA_ARGS ${SKIA_ARGS} is_debug=true)
+  set(SKIA_DEBUG_ARG is_debug=true)
 endif()
 
 if(MSVC)
+  set(SKIA_ARGS --args=is_official_build=true skia_use_piex=false skia_enable_tools=false ${SKIA_DEBUG_ARG})
   set(CMD_C cmd /c)
   set(SKIA_LIB_NAME skia.lib)
-  set(SKIA_BUILD_COMMAND cmd /s /c "cd <SOURCE_DIR> && python bin/fetch-gn && gn gen <BINARY_DIR> --args=\"${SKIA_ARGS}\"")
+  # EVERY SPACE, \ AND " BELOW IS MAGIC. BLACK MAGIC. DO NOT TOUCH IT OR YOU WILL ANGER THE CMAKE GODS
+  set(SKIA_BUILD_COMMAND cmd /s /c "cd <SOURCE_DIR> && python bin/fetch-gn && gn gen <BINARY_DIR> " ${SKIA_ARGS} "\ ")
 
   # build using the static runtime, to match skia
   foreach(flag_var
@@ -23,9 +24,9 @@ if(MSVC)
     endif(${flag_var} MATCHES "/MD")
   endforeach(flag_var)
 else()
+  set(SKIA_ARGS "is_official_build=true skia_use_piex=false skia_enable_tools=false ${SKIA_DEBUG_ARG} extra_cflags=[\"-w\"]")
   set(CMD_C "")
   set(SKIA_LIB_NAME libskia.a)
-  set(SKIA_ARGS "${SKIA_ARGS} extra_cflags=[\"-w\"]")
   set(SKIA_BUILD_COMMAND cd <SOURCE_DIR> && python bin/fetch-gn && gn gen <BINARY_DIR> --args=${SKIA_ARGS})
 endif()
 
